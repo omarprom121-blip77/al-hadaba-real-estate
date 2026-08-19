@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';import {signAdmin} from '../../../lib/auth';
+export async function POST(req){const {phone,password}=await req.json();if(phone!==process.env.ADMIN_PHONE||password!==process.env.ADMIN_PASSWORD)return NextResponse.json({error:'رقم الهاتف أو كلمة المرور غير صحيحة'},{status:401});const res=NextResponse.json({ok:true});res.cookies.set('admin_token',signAdmin(),{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:60*60*24*7});return res}

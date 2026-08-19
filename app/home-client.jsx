@@ -27,7 +27,7 @@ export default function HomeClient() {
   return <main>
     <header className="nav">
       <div className="container nav-inner">
-        <Link href="/" className="brand"><span className="logoMark">هـ</span><span>عقارات الهضبة</span></Link>
+        <Link href="/" className="brand" aria-label="عقارات الهضبة"><img src="/al-hadaba-logo.png" alt="شعار عقارات الهضبة" className="brand-logo" /><span>عقارات الهضبة</span></Link>
         <nav>
           <Link href="/finishing">التشطيبات</Link>
           <Link href="/buildings">المباني</Link>
@@ -74,6 +74,6 @@ export default function HomeClient() {
     </div></section>
 
     <a className="whatsapp" href={`https://wa.me/${wa}?text=${encodeURIComponent('مرحبًا، أريد الاستفسار عن أحد المشروعات العقارية.')}`} target="_blank" rel="noreferrer" aria-label="واتساب">◔</a>
-    <footer><div className="container footer-inner"><strong>عقارات الهضبة</strong><span>أفضل الفرص العقارية والاستثمارية.</span><span>© {new Date().getFullYear()} جميع الحقوق محفوظة.</span></div></footer>
+    <footer><div className="container footer-inner"><img src="/al-hadaba-logo.png" alt="شعار عقارات الهضبة" className="footer-logo" /><strong>عقارات الهضبة</strong><span>أفضل الفرص العقارية والاستثمارية.</span><span>© {new Date().getFullYear()} جميع الحقوق محفوظة.</span></div></footer>
   </main>
 }

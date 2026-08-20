@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+"use client"; import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 const wa = process.env.NEXT_PUBLIC_WHATSAPP || '201154833016';

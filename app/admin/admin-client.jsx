@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react';import {useRouter} from 'next/navigation';
+"use client";    import {useEffect,useState} from 'react';import {useRouter} from 'next/navigation';
 export default function AdminClient(){const [items,setItems]=useState([]),[comments,setComments]=useState([]),[tab,setTab]=useState('projects'),[form,setForm]=useState({title:'',description:'',image:'',video:'',type:'projects'}),[msg,setMsg]=useState(''),[upload,setUpload]=useState(null);const router=useRouter();
 async function load(){const r=await fetch('/api/admin/content');if(r.status===401)return router.push('/login');const d=await r.json();setItems(d.items||[]);const cr=await fetch('/api/admin/comments');if(cr.ok)setComments((await cr.json()).items||[])}
 useEffect(()=>{load()},[]);

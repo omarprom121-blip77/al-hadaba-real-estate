@@ -14,12 +14,26 @@ export default function AdminClient() {
     title: '',
     description: '',
     image: '',
-    video: ''
+    imagePublicId: '',
+    imageResourceType: '',
+    video: '',
+    videoPublicId: '',
+    videoResourceType: ''
   });
 
   const [uploads, setUploads] = useState({ image: null, video: null });
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  async function readJsonResponse(response) {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch (error) {
+      console.error('[v0] Non-JSON API response:', response.status, text.slice(0, 300));
+      throw new Error('حدث خطأ أثناء الاتصال بالخادم');
+    }
+  }
 
   // تحميل المحتوى والتعليقات
   async function load() {
@@ -80,6 +94,9 @@ export default function AdminClient() {
     setMsg('جاري نشر المحتوى...');
 
     try {
+      const imageMedia = form.image ? { url: form.image, publicId: form.imagePublicId, resourceType: form.imageResourceType } : (uploads.image ? await uploadFile(uploads.image, 'image') : null);
+      const videoMedia = form.video ? { url: form.video, publicId: form.videoPublicId, resourceType: form.videoResourceType } : (uploads.video ? await uploadFile(uploads.video, 'video') : null);
+      if ((uploads.image && !imageMedia) || (uploads.video && !videoMedia)) return;
       const res = await fetch('/api/admin/content', {
         method: 'POST',
         headers: {
@@ -88,14 +105,18 @@ export default function AdminClient() {
         body: JSON.stringify({
           title: form.title,
           description: form.description,
-          image: form.image,
-          video: form.video,
+          image: imageMedia?.url || '',
+          imagePublicId: imageMedia?.publicId || '',
+          imageResourceType: imageMedia?.resourceType || '',
+          video: videoMedia?.url || '',
+          videoPublicId: videoMedia?.publicId || '',
+          videoResourceType: videoMedia?.resourceType || '',
           type: tab,
           published: true
         })
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'حدث خطأ أثناء النشر');
@@ -108,8 +129,13 @@ export default function AdminClient() {
         title: '',
         description: '',
         image: '',
-        video: ''
+        imagePublicId: '',
+        imageResourceType: '',
+        video: '',
+        videoPublicId: '',
+        videoResourceType: ''
       });
+      setUploads({ image: null, video: null });
 
       await load();
     } catch (error) {
@@ -121,20 +147,37 @@ export default function AdminClient() {
   }
 
   async function uploadFile(file, field) {
-    if (!file) return;
+    if (!file) return null;
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    if ((field === 'image' && !isImage) || (field === 'video' && !isVideo)) {
+      setMsg(field === 'image' ? 'اختر ملف صورة صحيحًا' : 'اختر ملف فيديو صحيحًا');
+      return null;
+    }
     setLoading(true);
     setMsg(`جاري رفع ${field === 'image' ? 'الصورة' : 'الفيديو'}...`);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل رفع الملف');
-      setForm(prev => ({ ...prev, [field]: data.url, [`${field}PublicId`]: data.public_id || '' }));
+      const signatureResponse = await fetch('/api/upload/signature', { method: 'POST' });
+      const signature = await readJsonResponse(signatureResponse);
+      if (!signatureResponse.ok || !signature.success) throw new Error(signature.error || 'تعذر تجهيز الرفع');
+      const body = new FormData();
+      body.append('file', file);
+      body.append('api_key', signature.apiKey);
+      body.append('timestamp', String(signature.timestamp));
+      body.append('signature', signature.signature);
+      body.append('folder', signature.folder);
+      const resourceType = field === 'video' ? 'video' : 'image';
+      const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${signature.cloudName}/${resourceType}/upload`, { method: 'POST', body });
+      const cloudinaryData = await readJsonResponse(cloudinaryResponse);
+      if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) throw new Error(cloudinaryData.error?.message || 'فشل رفع الملف');
+      const media = { url: cloudinaryData.secure_url, publicId: cloudinaryData.public_id, resourceType: cloudinaryData.resource_type };
+      setForm(prev => ({ ...prev, [field]: media.url, [`${field}PublicId`]: media.publicId, [`${field}ResourceType`]: media.resourceType }));
       setMsg(`تم رفع ${field === 'image' ? 'الصورة' : 'الفيديو'} بنجاح`);
+      return media;
     } catch (error) {
-      console.error('[v0] Upload failed:', error);
+      console.error('[v0] Direct Cloudinary upload failed:', error);
       setMsg(error.message || 'حدث خطأ أثناء رفع الملف');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -151,7 +194,7 @@ export default function AdminClient() {
         method: 'DELETE'
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'فشل الحذف');
@@ -181,7 +224,7 @@ export default function AdminClient() {
         })
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'حدث خطأ');
@@ -212,7 +255,7 @@ export default function AdminClient() {
         method: 'DELETE'
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'فشل حذف التعليق');

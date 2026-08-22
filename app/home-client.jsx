@@ -30,6 +30,7 @@ export default function HomeClient() {
   const [data, setData] = useState({
     projects: [],
     investments: [],
+    finishing: [],
     comments: [],
   });
 
@@ -49,9 +50,13 @@ export default function HomeClient() {
 
   useEffect(() => {
     fetch("/api/public")
-      .then((r) => r.json())
-      .then(setData)
-      .catch(() => {});
+      .then((r) => r.json().then((payload) => ({ ok: r.ok, payload })))
+      .then(({ ok, payload }) => {
+        if (ok && payload.success !== false) {
+          setData({ projects: [], investments: [], finishing: [], comments: [], ...payload });
+        }
+      })
+      .catch((error) => console.error("[v0] Public content request failed:", error));
   }, []);
 
   async function submitContact(e) {

@@ -17,7 +17,7 @@ export default function AdminClient() {
     video: ''
   });
 
-  const [upload, setUpload] = useState(null);
+  const [uploads, setUploads] = useState({ image: null, video: null });
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -120,58 +120,21 @@ export default function AdminClient() {
     }
   }
 
-  // رفع صورة أو فيديو إلى Cloudinary
-  async function uploadFile(e) {
-    e.preventDefault();
-
-    if (!upload) {
-      setMsg('اختر صورة أو فيديو أولاً');
-      return;
-    }
-
+  async function uploadFile(file, field) {
+    if (!file) return;
     setLoading(true);
-    setMsg('جاري رفع الملف...');
-
+    setMsg(`جاري رفع ${field === 'image' ? 'الصورة' : 'الفيديو'}...`);
     try {
       const formData = new FormData();
-      formData.append('file', upload);
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData
-      });
-
+      formData.append('file', file);
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
       const data = await res.json();
-
-      if (!res.ok) {
-        setMsg(data.error || 'فشل رفع الملف');
-        return;
-      }
-
-      // لو الفيديو
-      if (data.type === 'video') {
-        setForm(prev => ({
-          ...prev,
-          video: data.url
-        }));
-
-        setMsg('✅ تم رفع الفيديو ووضع رابطه تلقائيًا');
-      }
-
-      // لو الصورة
-      else {
-        setForm(prev => ({
-          ...prev,
-          image: data.url
-        }));
-
-        setMsg('✅ تم رفع الصورة ووضع رابطها تلقائيًا');
-      }
-
-      setUpload(null);
+      if (!res.ok) throw new Error(data.error || 'فشل رفع الملف');
+      setForm(prev => ({ ...prev, [field]: data.url, [`${field}PublicId`]: data.public_id || '' }));
+      setMsg(`تم رفع ${field === 'image' ? 'الصورة' : 'الفيديو'} بنجاح`);
     } catch (error) {
-      console.error(error);
-      setMsg('حدث خطأ أثناء رفع الملف');
+      console.error('[v0] Upload failed:', error);
+      setMsg(error.message || 'حدث خطأ أثناء رفع الملف');
     } finally {
       setLoading(false);
     }
@@ -376,27 +339,17 @@ export default function AdminClient() {
                   }
                 />
 
-                <input
-                  placeholder="رابط الصورة"
-                  value={form.image}
-                  onChange={e =>
-                    setForm({
-                      ...form,
-                      image: e.target.value
-                    })
-                  }
-                />
+                <label className="upload-field">
+                  صورة المحتوى (اختياري)
+                  <input type="file" accept="image/*" onChange={e => { const file = e.target.files?.[0]; setUploads(prev => ({ ...prev, image: file || null })); uploadFile(file, 'image'); }} />
+                </label>
+                {form.image && <small>تم تجهيز الصورة للنشر</small>}
 
-                <input
-                  placeholder="رابط الفيديو (اختياري)"
-                  value={form.video}
-                  onChange={e =>
-                    setForm({
-                      ...form,
-                      video: e.target.value
-                    })
-                  }
-                />
+                <label className="upload-field">
+                  فيديو المحتوى (اختياري)
+                  <input type="file" accept="video/*" onChange={e => { const file = e.target.files?.[0]; setUploads(prev => ({ ...prev, video: file || null })); uploadFile(file, 'video'); }} />
+                </label>
+                {form.video && <small>تم تجهيز الفيديو للنشر</small>}
 
                 <button
                   type="submit"
@@ -404,34 +357,6 @@ export default function AdminClient() {
                   disabled={loading}
                 >
                   {loading ? 'جاري النشر...' : 'نشر المحتوى'}
-                </button>
-
-              </form>
-
-              {/* رفع ملف */}
-              <form
-                className="form admin-form"
-                onSubmit={uploadFile}
-              >
-
-                <h3>رفع صورة أو فيديو</h3>
-
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={e =>
-                    setUpload(
-                      e.target.files?.[0] || null
-                    )
-                  }
-                />
-
-                <button
-                  type="submit"
-                  className="btn ghost darkbtn"
-                  disabled={loading}
-                >
-                  {loading ? 'جاري الرفع...' : 'رفع الملف'}
                 </button>
 
               </form>

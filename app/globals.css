@@ -108,8 +108,9 @@ textarea {
 .top-branding {
   display: block;
   width: 100%;
-  max-height: 190px;
-  object-fit: cover;
+  height: auto;
+  max-height: none;
+  object-fit: contain;
   object-position: center;
   background: #fff;
 }
@@ -743,10 +744,6 @@ footer {
     height: 58px;
     left: 18px;
     bottom: 18px;
-  }
-
-  .top-branding {
-    max-height: 125px;
   }
 
   .whatsapp svg {

@@ -259,6 +259,7 @@ export default function HomeClient() {
                   <p>
                     {p.description}
                   </p>
+                  <Link href={`/projects/${encodeURIComponent(p._id)}`} className="text-link">عرض المزيد ←</Link>
                 </div>
               </article>
             ))}
@@ -346,10 +347,10 @@ export default function HomeClient() {
                   {c.name}
                 </strong>
 
-                <p>
-                  {c.comment}
-                </p>
-              </div>
+                  <p>
+                    {c.comment}
+                  </p>
+                </div>
             ))}
 
             {!data.comments.length && (

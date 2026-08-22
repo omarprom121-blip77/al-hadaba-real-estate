@@ -128,12 +128,12 @@ export default function AdminClient() {
 
       const data = await readApiResponse(res);
 
-      if (!res.ok) {
-        setMsg(data.error || 'حدث خطأ أثناء النشر');
+      if (!res.ok || !data.success || !data.item?._id || data.item.published !== true) {
+        setMsg(data.error || 'لم يؤكد الخادم حفظ المحتوى المنشور');
         return;
       }
 
-      setMsg('✅ تم نشر المحتوى بنجاح');
+      setMsg('تم نشر المحتوى بنجاح');
 
       setForm({
         title: '',

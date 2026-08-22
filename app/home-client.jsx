@@ -251,15 +251,7 @@ export default function HomeClient() {
                 className="card"
                 key={p._id}
               >
-                <div
-                  className="card-img"
-                  style={{
-                    backgroundImage: `url(${
-                      p.image ||
-                      "/hero-placeholder.svg"
-                    })`,
-                  }}
-                />
+                {p.video ? <video className="card-media" src={p.video} controls preload="metadata" playsInline aria-label={`فيديو ${p.title}`} /> : p.image ? <img className="card-media" src={p.image} alt={p.title} /> : <div className="card-img" />}
 
                 <div className="card-body">
                   <h3>{p.title}</h3>
@@ -308,15 +300,7 @@ export default function HomeClient() {
                 className="card"
                 key={p._id}
               >
-                <div
-                  className="card-img"
-                  style={{
-                    backgroundImage: `url(${
-                      p.image ||
-                      "/hero-placeholder.svg"
-                    })`,
-                  }}
-                />
+                {p.video ? <video className="card-media" src={p.video} controls preload="metadata" playsInline aria-label={`فيديو ${p.title}`} /> : p.image ? <img className="card-media" src={p.image} alt={p.title} /> : <div className="card-img" />}
 
                 <div className="card-body">
                   <h3>{p.title}</h3>

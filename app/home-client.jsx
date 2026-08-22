@@ -37,6 +37,7 @@ export default function HomeClient() {
     name: "",
     phone: "",
     email: "",
+    service: "",
     message: "",
   });
 
@@ -63,25 +64,26 @@ export default function HomeClient() {
     e.preventDefault();
     setNotice("جاري الإرسال...");
 
-    const r = await fetch("/api/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-
-    setNotice(
-      r.ok
-        ? "تم إرسال رسالتك بنجاح."
-        : "حدث خطأ، حاول مرة أخرى."
-    );
+    try {
+      const r = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const result = await r.json().catch(() => ({}));
+      setNotice(r.ok ? "تم إرسال رسالتك بنجاح، وسنتواصل معك قريبًا." : (result.error || "تعذر إرسال الرسالة حاليًا."));
+      if (!r.ok) return;
+    } catch {
+      setNotice("تعذر الاتصال بالخادم. حاول مرة أخرى.");
+      return;
+    }
 
     if (r.ok) {
       setForm({
         name: "",
         phone: "",
         email: "",
+        service: "",
         message: "",
       });
     }
@@ -421,6 +423,17 @@ href="#services"
                 })
               }
             />
+
+            <select
+              value={form.service}
+              onChange={(e) => setForm({ ...form, service: e.target.value })}
+              aria-label="نوع الخدمة"
+            >
+              <option value="">نوع الخدمة</option>
+              <option value="مقاولات عامة">مقاولات عامة</option>
+              <option value="حفر وبناء">حفر وبناء</option>
+              <option value="تشطيب كامل">تشطيب كامل</option>
+            </select>
 
             <textarea
               required

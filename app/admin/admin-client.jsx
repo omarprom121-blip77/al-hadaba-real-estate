@@ -9,6 +9,8 @@ export default function AdminClient() {
   const [tab, setTab] = useState('projects');
   const [items, setItems] = useState([]);
   const [comments, setComments] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [unread, setUnread] = useState(0);
 
   const [form, setForm] = useState({
     title: '',
@@ -40,17 +42,17 @@ export default function AdminClient() {
   // تحميل المحتوى والتعليقات
   async function load() {
     try {
-      const [contentRes, commentsRes] = await Promise.all([
+      const [contentRes, commentsRes, messagesRes] = await Promise.all([
         fetch('/api/admin/content', {
           cache: 'no-store'
         }),
-        fetch('/api/admin/comments', {
-          cache: 'no-store'
-        })
+        fetch('/api/admin/comments', { cache: 'no-store' }),
+        fetch('/api/admin/contacts', { cache: 'no-store' })
       ]);
 
       const contentData = await readApiResponse(contentRes);
       const commentsData = await readApiResponse(commentsRes);
+      const messagesData = await readApiResponse(messagesRes);
 
       if (contentRes.ok) {
         setItems(contentData.items || []);
@@ -58,6 +60,10 @@ export default function AdminClient() {
 
       if (commentsRes.ok) {
         setComments(commentsData.comments || commentsData.items || []);
+      }
+      if (messagesRes.ok) {
+        setMessages(messagesData.messages || []);
+        setUnread(messagesData.unread || 0);
       }
     } catch (error) {
       console.error(error);
@@ -198,6 +204,17 @@ export default function AdminClient() {
     }
   }
 
+  async function updateMessage(id, status) {
+    const res = await fetch('/api/admin/contacts', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
+    if (res.ok) await load(); else setMsg('تعذر تحديث حالة الرسالة');
+  }
+
+  async function deleteMessage(id) {
+    if (!confirm('هل تريد حذف هذه الرسالة؟')) return;
+    const res = await fetch(`/api/admin/contacts?id=${id}`, { method: 'DELETE' });
+    if (res.ok) await load(); else setMsg('تعذر حذف الرسالة');
+  }
+
   // حذف محتوى
   async function del(id) {
     const ok = confirm('هل أنت متأكد أنك تريد حذف هذا المحتوى؟');
@@ -291,9 +308,11 @@ export default function AdminClient() {
       ? 'المباني'
       : tab === 'finishing'
         ? 'التشطيبات'
-        : tab === 'investments'
+          : tab === 'investments'
           ? 'الاستثمارات'
-          : 'التعليقات';
+          : tab === 'messages'
+            ? 'الرسائل'
+            : 'التعليقات';
 
   return (
     <main className="admin-page">
@@ -336,6 +355,8 @@ export default function AdminClient() {
             استثمار
           </button>
 
+          <button onClick={() => setTab('messages')} className={tab === 'messages' ? 'active' : ''}>الرسائل {unread > 0 && <span className="badge">{unread}</span>}</button>
+
           <button
             onClick={() => setTab('comments')}
             className={tab === 'comments' ? 'active' : ''}
@@ -362,7 +383,27 @@ export default function AdminClient() {
           {/* المحتوى */}
           {/* ========================= */}
 
-          {tab !== 'comments' ? (
+          {tab === 'messages' ? (
+            <div className="admin-list messages-list">
+              {messages.map((item) => (
+                <article className={`admin-item message-item ${item.status === 'unread' ? 'is-unread' : ''}`} key={item._id}>
+                  <div>
+                    <strong>{item.name}</strong>
+                    <p>{item.message}</p>
+                    <small>{item.phone} · {item.email || 'بدون بريد'} · {item.service || 'خدمة عامة'}</small>
+                    <small>تاريخ الإرسال: {item.createdAt ? new Date(item.createdAt).toLocaleString('ar-EG') : '-'}</small>
+                  </div>
+                  <div className="actions">
+                    <a className="btn ghost darkbtn" href={`tel:${item.phone}`}>اتصال</a>
+                    <a className="btn ghost darkbtn" href={`https://wa.me/${item.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">واتساب</a>
+                    <button className="btn primary" onClick={() => updateMessage(item._id, item.status === 'unread' ? 'read' : 'unread')}>{item.status === 'unread' ? 'تحديد كمقروءة' : 'تحديد كغير مقروءة'}</button>
+                    <button className="btn danger" onClick={() => deleteMessage(item._id)}>حذف</button>
+                  </div>
+                </article>
+              ))}
+              {!messages.length && <div className="empty">لا توجد رسائل.</div>}
+            </div>
+          ) : tab !== 'comments' ? (
 
             <>
 

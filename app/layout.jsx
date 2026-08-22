@@ -3,8 +3,8 @@ import WhatsAppButton from '../components/whatsapp-button';
 
 export const metadata = {
   title: 'عقارات الهضبة',
-  description: 'عقارات الهضبة — أفضل الفرص العقارية والاستثمارية.',
-  openGraph: { title: 'عقارات الهضبة', description: 'أفضل الفرص العقارية والاستثمارية.' }
+  description: 'شركة عقارات الهضبة للمقاولات العامة والحفر والبناء والتشطيب الكامل.',
+  openGraph: { title: 'عقارات الهضبة', description: 'مقاولات عامة وحفر وبناء وتشطيب كامل بأعلى معايير الجودة.' }
 };
 
 export default function RootLayout({ children }) {

@@ -29,7 +29,6 @@ function WhatsAppIcon() {
 export default function HomeClient() {
   const [data, setData] = useState({
     projects: [],
-    investments: [],
     finishing: [],
     comments: [],
   });
@@ -47,13 +46,14 @@ export default function HomeClient() {
   });
 
   const [notice, setNotice] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/public")
       .then((r) => r.json().then((payload) => ({ ok: r.ok, payload })))
       .then(({ ok, payload }) => {
         if (ok && payload.success !== false) {
-          setData({ projects: [], investments: [], finishing: [], comments: [], ...payload });
+          setData({ projects: [], finishing: [], comments: [], ...payload });
         }
       })
       .catch((error) => console.error("[v0] Public content request failed:", error));
@@ -133,17 +133,18 @@ export default function HomeClient() {
             <span>عقارات الهضبة</span>
           </Link>
 
-          <nav>
-            <Link href="/finishing">التشطيبات</Link>
-            <Link href="/buildings">المباني</Link>
-            <Link href="/investment">استثمار</Link>
-
-            <Link
-              href="/login"
-              className="nav-admin"
-            >
-              دخول الإدارة
-            </Link>
+          <button className="menu-toggle" type="button" aria-expanded={menuOpen} aria-controls="main-menu" onClick={() => setMenuOpen((open) => !open)}>
+            <span className="sr-only">فتح القائمة</span>
+            <span />
+            <span />
+            <span />
+          </button>
+          <nav id="main-menu" className={menuOpen ? "menu-open" : ""}>
+            <Link href="/finishing" onClick={() => setMenuOpen(false)}>التشطيبات</Link>
+            <Link href="/buildings" onClick={() => setMenuOpen(false)}>المباني</Link>
+            <Link href="#projects" onClick={() => setMenuOpen(false)}>المشروعات</Link>
+            <Link href="#contact" onClick={() => setMenuOpen(false)}>تواصل معنا</Link>
+            <Link href="/login" className="nav-admin">دخول الإدارة</Link>
           </nav>
         </div>
       </header>
@@ -153,23 +154,18 @@ export default function HomeClient() {
         <div className="hero-overlay" />
 
         <div className="container hero-content">
-          <div className="eyebrow">
-            حلول عقارية بثقة
-          </div>
+            <div className="eyebrow">شركة عقارات الهضبة</div>
 
-          <h1>عقارات الهضبة</h1>
+            <h1>البناء الحديث<br />بخبرة تتجاوز ١٢ عامًا</h1>
 
-          <p>
-            نساعدك في العثور على أفضل الفرص العقارية
-            والاستثمارية بطريقة سهلة واحترافية.
-          </p>
+            <p>مقاولات عامة، حفر وبناء، وتشطيب كامل بأعلى معايير الجودة — من الأساس إلى اللمسة الأخيرة.</p>
 
           <div className="actions">
             <a
-              href="#projects"
+href="#services"
               className="btn primary"
             >
-              استكشف المشروعات
+              تعرف على خدماتنا
             </a>
 
             <a
@@ -273,51 +269,20 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ================= INVESTMENT ================= */}
-      <section className="section">
+
+      {/* ================= SERVICES ================= */}
+      <section className="section services" id="services">
         <div className="container">
-          <div className="section-head">
+          <div className="section-head services-head">
             <div>
-              <div className="eyebrow dark">
-                فرص واعدة
-              </div>
-
-              <h2>
-                الاستثمار
-              </h2>
+              <div className="eyebrow dark">خدماتنا</div>
+              <h2>نبني بثقة وننجز بإتقان</h2>
             </div>
-
-            <Link
-              href="/investment"
-              className="text-link"
-            >
-              عرض الفرص ←
-            </Link>
           </div>
-
           <div className="cards">
-            {data.investments.map((p) => (
-              <article
-                className="card"
-                key={p._id}
-              >
-                {p.video ? <video className="card-media" src={p.video} controls preload="metadata" playsInline aria-label={`فيديو ${p.title}`} /> : p.image ? <img className="card-media" src={p.image} alt={p.title} /> : <div className="card-img" />}
-
-                <div className="card-body">
-                  <h3>{p.title}</h3>
-
-                  <p>
-                    {p.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-
-            {!data.investments.length && (
-              <div className="empty">
-                أضف فرص الاستثمار من لوحة التحكم.
-              </div>
-            )}
+            <article className="service-card"><span className="service-icon">01</span><h3>مقاولات عامة</h3><p>إدارة وتنفيذ متكامل لمشروعاتك من البداية حتى التسليم.</p></article>
+            <article className="service-card"><span className="service-icon">02</span><h3>حفر وبناء</h3><p>أساسات قوية وتنفيذ دقيق يضمن جودة واستدامة كل مشروع.</p></article>
+            <article className="service-card"><span className="service-icon">03</span><h3>تشطيب كامل</h3><p>تفاصيل نهائية راقية بأعلى معايير الجودة والاهتمام.</p></article>
           </div>
         </div>
       </section>
@@ -402,7 +367,7 @@ export default function HomeClient() {
       </section>
 
       {/* ================= CONTACT ================= */}
-      <section className="section contact">
+      <section className="section contact" id="contact">
         <div className="container split">
           <div>
             <div className="eyebrow dark">
@@ -485,18 +450,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ================= WHATSAPP ================= */}
-      <a
-        className="whatsapp"
-        href={`https://wa.me/${wa}?text=${encodeURIComponent(
-          "مرحبًا، أريد الاستفسار عن أحد المشروعات العقارية."
-        )}`}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="تواصل معنا عبر واتساب"
-      >
-        <WhatsAppIcon />
-      </a>
+
 
       {/* ================= FOOTER ================= */}
       <footer>

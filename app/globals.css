@@ -103,6 +103,13 @@ textarea {
   background: #ffffff12;
 }
 
+.menu-toggle { display: none; border: 0; background: transparent; color: currentColor; padding: 10px; flex-direction: column; gap: 5px; cursor: pointer; }
+.menu-toggle span:not(.sr-only) { display: block; width: 22px; height: 2px; background: currentColor; }
+
+.service-card { padding: 28px; background: var(--dark); color: #fff; border-radius: 20px; border: 1px solid #ffffff12; }
+.service-card p { color: #cfd6d9; margin-bottom: 0; }
+.service-icon { color: var(--gold-light); font-weight: 800; font-size: 14px; }
+
 /* ================= HERO ================= */
 
 .top-branding {
@@ -121,7 +128,7 @@ textarea {
   background-image: url('/skyscrapers.jpeg');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-attachment: scroll;
   display: flex;
   align-items: center;
   color: #fff;
@@ -639,6 +646,12 @@ footer {
 /* ================= MOBILE ================= */
 
 @media (max-width: 800px) {
+  body { overflow-x: hidden; }
+
+  .container { width: min(100% - 32px, 560px); }
+
+  .top-branding { max-height: 92px; object-fit: cover; }
+
   .nav-inner {
     min-height: 78px;
   }
@@ -653,43 +666,50 @@ footer {
     height: 65px;
   }
 
+  .menu-toggle { display: inline-flex; }
+
   .nav nav {
-    gap: 10px;
-    font-size: 12px;
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 16px;
+    right: 16px;
+    padding: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    background: var(--dark);
+    border: 1px solid #ffffff22;
+    border-radius: 14px;
+    box-shadow: 0 18px 45px #0006;
   }
 
-  .nav-admin {
-    display: none;
-  }
+  .nav nav.menu-open { display: flex; }
+  .nav nav a { padding: 12px; }
 
   .hero {
-    min-height: 680px;
+    min-height: 620px;
+    background-position: 62% center;
   }
 
   .hero-content {
+    width: min(100% - 32px, 560px);
     margin: auto;
-    padding: 120px 4% 0;
-    text-align: center;
+    padding: 112px 0 48px;
+    text-align: right;
   }
 
-  .hero h1 {
-    font-size: 55px;
-  }
+  .eyebrow { font-size: 14px; }
+  .hero h1 { font-size: clamp(38px, 11vw, 54px); line-height: 1.18; margin-bottom: 18px; }
+  .hero p { font-size: 16px; line-height: 1.9; margin: 0; max-width: none; }
+  .actions { justify-content: stretch; flex-direction: column; gap: 10px; margin-top: 24px; }
+  .btn { width: 100%; min-height: 52px; font-size: 15px; padding: 12px 16px; }
 
-  .hero p {
-    font-size: 17px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .actions {
-    justify-content: center;
-  }
-
-  .btn {
-    font-size: 13px;
-    padding: 11px 15px;
-  }
+  .services-head { margin-bottom: 20px; }
+  .service-card { min-width: 0; }
+  .section-head { flex-wrap: wrap; }
+  .section-head > * { min-width: 0; }
+  .whatsapp { left: 16px; bottom: 16px; width: 58px; height: 58px; }
 
   .section {
     padding: 65px 0;
@@ -740,15 +760,15 @@ footer {
   }
 
   .whatsapp {
-    width: 58px;
-    height: 58px;
-    left: 18px;
-    bottom: 18px;
+    width: 64px;
+    height: 64px;
+    left: 24px;
+    bottom: 24px;
   }
 
   .whatsapp svg {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
   }
 }
 

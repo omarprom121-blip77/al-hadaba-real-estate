@@ -28,7 +28,7 @@ export async function POST(req) {
     const body = await req.json();
     if (!body.title?.trim() || !body.description?.trim()) return jsonError('العنوان والوصف مطلوبان', 400);
     if (!['projects', 'finishing', 'investments'].includes(body.type)) return jsonError('قسم المحتوى غير صحيح', 400);
-    const item = { title: body.title.trim(), description: body.description.trim(), type: body.type, image: body.image || '', imagePublicId: body.imagePublicId || '', imageResourceType: body.imageResourceType || '', video: body.video || '', videoPublicId: body.videoPublicId || '', videoResourceType: body.videoResourceType || '', published: true, createdAt: new Date() };
+    const item = { title: body.title.trim(), description: body.description.trim(), type: body.type, image: body.image || '', imagePublicId: body.imagePublicId || '', imageResourceType: body.imageResourceType || '', imageFormat: body.imageFormat || '', imageWidth: body.imageWidth || null, imageHeight: body.imageHeight || null, video: body.video || '', videoPublicId: body.videoPublicId || '', videoResourceType: body.videoResourceType || '', videoFormat: body.videoFormat || '', videoWidth: body.videoWidth || null, videoHeight: body.videoHeight || null, videoDuration: body.videoDuration || null, mediaType: body.mediaType || 'none', published: true, createdAt: new Date() };
     const client = await db;
     const result = await client.db(process.env.MONGODB_DB).collection('content').insertOne(item);
     return NextResponse.json({ success: true, ok: true, item: { ...item, _id: result.insertedId.toString() } });

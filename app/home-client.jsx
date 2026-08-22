@@ -110,6 +110,7 @@ export default function HomeClient() {
 
   return (
     <main>
+      <img src="/alhadba-branding.jpeg" alt="هوية شركة عقارات الهضبة" className="top-branding" />
       {/* ================= HEADER ================= */}
       <header className="nav">
         <div className="container nav-inner">

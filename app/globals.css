@@ -409,8 +409,18 @@ textarea {
   gap: 14px;
 }
 
+.contact .form {
+  background: var(--dark);
+  color: #fff;
+  border: 1px solid #b18a4b55;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 18px 50px #0002;
+}
+
 .form input,
-.form textarea {
+.form textarea,
+.form select {
   font: inherit;
   border: 1px solid #ddd5c8;
   background: #fff;
@@ -420,8 +430,25 @@ textarea {
   transition: 0.2s;
 }
 
+.form input::placeholder,
+.form textarea::placeholder { color: #b8b0a4; }
+
+.form select { appearance: none; color: #b8b0a4; }
+.form select option { color: #171513; }
+
+.contact .form input,
+.contact .form textarea,
+.contact .form select {
+  background: transparent;
+  color: #fff;
+  border-color: #ffffff2b;
+}
+
+.contact .form .btn { margin-top: 4px; }
+
 .form input:focus,
-.form textarea:focus {
+.form textarea:focus,
+.form select:focus {
   border-color: var(--gold);
   box-shadow: 0 0 0 3px #b18a4b15;
 }
@@ -622,6 +649,11 @@ footer {
   display: grid;
   gap: 12px;
 }
+
+.badge { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; margin-inline-start: 6px; border-radius: 999px; background: var(--gold); color: var(--dark); font-size: 12px; }
+.message-item { align-items: flex-start; }
+.message-item.is-unread { border-color: var(--gold); box-shadow: 0 0 0 2px #b18a4b18; }
+.message-item small { display: block; margin-top: 6px; color: var(--muted); }
 
 .admin-item {
   background: #fff;

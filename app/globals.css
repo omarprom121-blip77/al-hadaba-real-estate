@@ -125,9 +125,10 @@ textarea {
 .hero {
   min-height: 760px;
   position: relative;
-  background-image: url('/skyscrapers.jpeg');
+  background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%20Aug%2022%2C%202026%2C%2010_16_02%20AM-kPY1zLi8TKvyqV4fkc8V1hnaQ91ZNh.png');
   background-size: cover;
-  background-position: center;
+  background-position: center 42%;
+  background-repeat: no-repeat;
   background-attachment: scroll;
   display: flex;
   align-items: center;
@@ -689,7 +690,9 @@ footer {
 
   .hero {
     min-height: 620px;
-    background-position: 62% center;
+    background-position: 58% center;
+    background-size: cover;
+    background-repeat: no-repeat;
   }
 
   .hero-content {

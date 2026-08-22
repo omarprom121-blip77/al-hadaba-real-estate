@@ -30,8 +30,11 @@ export async function POST(req) {
     if (!['projects', 'finishing', 'investments'].includes(body.type)) return jsonError('قسم المحتوى غير صحيح', 400);
     const item = { title: body.title.trim(), description: body.description.trim(), type: body.type, image: body.image || '', imagePublicId: body.imagePublicId || '', imageResourceType: body.imageResourceType || '', imageFormat: body.imageFormat || '', imageWidth: body.imageWidth || null, imageHeight: body.imageHeight || null, video: body.video || '', videoPublicId: body.videoPublicId || '', videoResourceType: body.videoResourceType || '', videoFormat: body.videoFormat || '', videoWidth: body.videoWidth || null, videoHeight: body.videoHeight || null, videoDuration: body.videoDuration || null, mediaType: body.mediaType || 'none', published: true, createdAt: new Date() };
     const client = await db;
-    const result = await client.db(process.env.MONGODB_DB).collection('content').insertOne(item);
-    return NextResponse.json({ success: true, ok: true, item: { ...item, _id: result.insertedId.toString() } });
+    const collection = client.db(process.env.MONGODB_DB).collection('content');
+    const result = await collection.insertOne(item);
+    const saved = await collection.findOne({ _id: result.insertedId, published: true });
+    if (!saved) return jsonError('تمت عملية الإدخال دون تأكيد المحتوى المنشور');
+    return NextResponse.json({ success: true, ok: true, item: { ...saved, _id: saved._id.toString() } });
   } catch (error) {
     console.error('[v0] Admin content POST failed:', error);
     return jsonError('تعذر نشر المحتوى');

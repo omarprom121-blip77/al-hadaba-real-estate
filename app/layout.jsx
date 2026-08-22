@@ -1,4 +1,5 @@
 import './globals.css';
+import WhatsAppButton from '../components/whatsapp-button';
 
 export const metadata = {
   title: 'عقارات الهضبة',
@@ -7,5 +8,5 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  return <html lang="ar" dir="rtl"><body>{children}</body></html>;
+  return <html lang="ar" dir="rtl"><body>{children}<WhatsAppButton /></body></html>;
 }

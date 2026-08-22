@@ -485,18 +485,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ================= WHATSAPP ================= */}
-      <a
-        className="whatsapp"
-        href={`https://wa.me/${wa}?text=${encodeURIComponent(
-          "مرحبًا، أريد الاستفسار عن أحد المشروعات العقارية."
-        )}`}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="تواصل معنا عبر واتساب"
-      >
-        <WhatsAppIcon />
-      </a>
+
 
       {/* ================= FOOTER ================= */}
       <footer>

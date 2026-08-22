@@ -740,15 +740,15 @@ footer {
   }
 
   .whatsapp {
-    width: 58px;
-    height: 58px;
-    left: 18px;
-    bottom: 18px;
+    width: 64px;
+    height: 64px;
+    left: 24px;
+    bottom: 24px;
   }
 
   .whatsapp svg {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
   }
 }
 

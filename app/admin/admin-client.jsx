@@ -14,12 +14,28 @@ export default function AdminClient() {
     title: '',
     description: '',
     image: '',
-    video: ''
+    imagePublicId: '',
+    imageResourceType: '',
+    video: '',
+    videoPublicId: '',
+    videoResourceType: ''
   });
 
   const [uploads, setUploads] = useState({ image: null, video: null });
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  async function readApiResponse(response) {
+    const text = await response.text();
+    const contentType = response.headers.get('content-type') || '';
+    if (!text) return {};
+    if (contentType.includes('application/json')) {
+      try { return JSON.parse(text); } catch { throw new Error('استجابة غير صالحة من الخادم'); }
+    }
+    const message = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (response.status === 413) throw new Error('حجم الملف كبير جدًا. تم إيقاف الرفع قبل النشر.');
+    throw new Error(message.slice(0, 240) || `تعذر إتمام الطلب (${response.status})`);
+  }
 
   // تحميل المحتوى والتعليقات
   async function load() {
@@ -33,8 +49,8 @@ export default function AdminClient() {
         })
       ]);
 
-      const contentData = await contentRes.json();
-      const commentsData = await commentsRes.json();
+      const contentData = await readApiResponse(contentRes);
+      const commentsData = await readApiResponse(commentsRes);
 
       if (contentRes.ok) {
         setItems(contentData.items || []);
@@ -80,6 +96,9 @@ export default function AdminClient() {
     setMsg('جاري نشر المحتوى...');
 
     try {
+      const imageMedia = form.image ? { url: form.image, publicId: form.imagePublicId, resourceType: form.imageResourceType, format: form.imageFormat, width: form.imageWidth, height: form.imageHeight, duration: null } : (uploads.image ? await uploadFile(uploads.image, 'image') : null);
+      const videoMedia = form.video ? { url: form.video, publicId: form.videoPublicId, resourceType: form.videoResourceType, format: form.videoFormat, width: form.videoWidth, height: form.videoHeight, duration: form.videoDuration } : (uploads.video ? await uploadFile(uploads.video, 'video') : null);
+      if ((uploads.image && !imageMedia) || (uploads.video && !videoMedia)) return;
       const res = await fetch('/api/admin/content', {
         method: 'POST',
         headers: {
@@ -88,14 +107,26 @@ export default function AdminClient() {
         body: JSON.stringify({
           title: form.title,
           description: form.description,
-          image: form.image,
-          video: form.video,
+          image: imageMedia?.url || '',
+          imagePublicId: imageMedia?.publicId || '',
+          imageResourceType: imageMedia?.resourceType || '',
+          video: videoMedia?.url || '',
+          videoPublicId: videoMedia?.publicId || '',
+          videoResourceType: videoMedia?.resourceType || '',
+          mediaType: videoMedia?.url ? 'video' : imageMedia?.url ? 'image' : 'none',
+          imageFormat: imageMedia?.format || '',
+          imageWidth: imageMedia?.width || null,
+          imageHeight: imageMedia?.height || null,
+          videoFormat: videoMedia?.format || '',
+          videoWidth: videoMedia?.width || null,
+          videoHeight: videoMedia?.height || null,
+          videoDuration: videoMedia?.duration || null,
           type: tab,
           published: true
         })
       });
 
-      const data = await res.json();
+      const data = await readApiResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'حدث خطأ أثناء النشر');
@@ -108,8 +139,13 @@ export default function AdminClient() {
         title: '',
         description: '',
         image: '',
-        video: ''
+        imagePublicId: '',
+        imageResourceType: '',
+        video: '',
+        videoPublicId: '',
+        videoResourceType: ''
       });
+      setUploads({ image: null, video: null });
 
       await load();
     } catch (error) {
@@ -121,20 +157,42 @@ export default function AdminClient() {
   }
 
   async function uploadFile(file, field) {
-    if (!file) return;
+    if (!file) return null;
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    const maxBytes = field === 'video' ? 200 * 1024 * 1024 : 15 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setMsg(field === 'video' ? 'حجم الفيديو أكبر من 200 ميجابايت' : 'حجم الصورة أكبر من 15 ميجابايت');
+      return null;
+    }
+    if ((field === 'image' && !isImage) || (field === 'video' && !isVideo)) {
+      setMsg(field === 'image' ? 'اختر ملف صورة صحيحًا' : 'اختر ملف فيديو صحيحًا');
+      return null;
+    }
     setLoading(true);
     setMsg(`جاري رفع ${field === 'image' ? 'الصورة' : 'الفيديو'}...`);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل رفع الملف');
-      setForm(prev => ({ ...prev, [field]: data.url, [`${field}PublicId`]: data.public_id || '' }));
+      const signatureResponse = await fetch('/api/upload/signature', { method: 'POST' });
+      const signature = await readApiResponse(signatureResponse);
+      if (!signatureResponse.ok || !signature.success) throw new Error(signature.error || 'تعذر تجهيز الرفع');
+      const body = new FormData();
+      body.append('file', file);
+      body.append('api_key', signature.apiKey);
+      body.append('timestamp', String(signature.timestamp));
+      body.append('signature', signature.signature);
+      body.append('folder', signature.folder);
+      const resourceType = field === 'video' ? 'video' : 'image';
+      const cloudinaryResponse = await fetch(`https://api.cloudinary.com/v1_1/${signature.cloudName}/${resourceType}/upload`, { method: 'POST', body });
+      const cloudinaryData = await readApiResponse(cloudinaryResponse);
+      if (!cloudinaryResponse.ok || !cloudinaryData.secure_url) throw new Error(cloudinaryData.error?.message || 'فشل رفع الملف');
+      const media = { url: cloudinaryData.secure_url, publicId: cloudinaryData.public_id, resourceType: cloudinaryData.resource_type, format: cloudinaryData.format || '', width: cloudinaryData.width || null, height: cloudinaryData.height || null, duration: cloudinaryData.duration || null };
+      setForm(prev => ({ ...prev, [field]: media.url, [`${field}PublicId`]: media.publicId, [`${field}ResourceType`]: media.resourceType, [`${field}Format`]: media.format, [`${field}Width`]: media.width, [`${field}Height`]: media.height, [`${field}Duration`]: media.duration }));
       setMsg(`تم رفع ${field === 'image' ? 'الصورة' : 'الفيديو'} بنجاح`);
+      return media;
     } catch (error) {
-      console.error('[v0] Upload failed:', error);
+      console.error('[v0] Direct Cloudinary upload failed:', error);
       setMsg(error.message || 'حدث خطأ أثناء رفع الملف');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -151,7 +209,7 @@ export default function AdminClient() {
         method: 'DELETE'
       });
 
-      const data = await res.json();
+      const data = await readApiResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'فشل الحذف');
@@ -181,7 +239,7 @@ export default function AdminClient() {
         })
       });
 
-      const data = await res.json();
+      const data = await readApiResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'حدث خطأ');
@@ -212,7 +270,7 @@ export default function AdminClient() {
         method: 'DELETE'
       });
 
-      const data = await res.json();
+      const data = await readApiResponse(res);
 
       if (!res.ok) {
         setMsg(data.error || 'فشل حذف التعليق');

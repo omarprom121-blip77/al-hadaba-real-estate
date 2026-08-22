@@ -2,9 +2,13 @@ import './globals.css';
 import WhatsAppButton from '../components/whatsapp-button';
 
 export const metadata = {
-  title: 'عقارات الهضبة',
+  title: 'شركة عقارات الهضبة',
   description: 'شركة عقارات الهضبة للمقاولات العامة والحفر والبناء والتشطيب الكامل.',
-  openGraph: { title: 'عقارات الهضبة', description: 'مقاولات عامة وحفر وبناء وتشطيب كامل بأعلى معايير الجودة.' }
+  icons: {
+    icon: [{ url: '/al-hadaba-logo.png', type: 'image/png' }],
+    apple: [{ url: '/al-hadaba-logo.png', type: 'image/png' }],
+  },
+  openGraph: { title: 'شركة عقارات الهضبة', description: 'مقاولات عامة وحفر وبناء وتشطيب كامل بأعلى معايير الجودة.' }
 };
 
 export default function RootLayout({ children }) {

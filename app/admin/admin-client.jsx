@@ -11,6 +11,7 @@ export default function AdminClient() {
   const [comments, setComments] = useState([]);
   const [messages, setMessages] = useState([]);
   const [unread, setUnread] = useState(0);
+  const [marketingRequests, setMarketingRequests] = useState({ sell: [], buy: [] });
 
   const [form, setForm] = useState({
     title: '',
@@ -42,17 +43,19 @@ export default function AdminClient() {
   // تحميل المحتوى والتعليقات
   async function load() {
     try {
-      const [contentRes, commentsRes, messagesRes] = await Promise.all([
+      const [contentRes, commentsRes, messagesRes, marketingRes] = await Promise.all([
         fetch('/api/admin/content', {
           cache: 'no-store'
         }),
         fetch('/api/admin/comments', { cache: 'no-store' }),
-        fetch('/api/admin/contacts', { cache: 'no-store' })
+        fetch('/api/admin/contacts', { cache: 'no-store' }),
+        fetch('/api/admin/marketing', { cache: 'no-store' })
       ]);
 
       const contentData = await readApiResponse(contentRes);
       const commentsData = await readApiResponse(commentsRes);
       const messagesData = await readApiResponse(messagesRes);
+      const marketingData = await readApiResponse(marketingRes);
 
       if (contentRes.ok) {
         setItems(contentData.items || []);
@@ -65,6 +68,7 @@ export default function AdminClient() {
         setMessages(messagesData.messages || []);
         setUnread(messagesData.unread || 0);
       }
+      if (marketingRes.ok) setMarketingRequests({ sell: marketingData.sell || [], buy: marketingData.buy || [] });
     } catch (error) {
       console.error(error);
       setMsg('حدث خطأ أثناء تحميل البيانات');
@@ -204,6 +208,16 @@ export default function AdminClient() {
     }
   }
 
+  async function updateMarketing(id, type, status) {
+    const response = await fetch('/api/admin/marketing', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, type, status }) });
+    if (response.ok) await load(); else setMsg('تعذر تحديث حالة الطلب');
+  }
+  async function deleteMarketing(id, type) {
+    if (!confirm('هل تريد حذف هذا الطلب؟')) return;
+    const response = await fetch(`/api/admin/marketing?id=${id}&type=${type}`, { method: 'DELETE' });
+    if (response.ok) await load(); else setMsg('تعذر حذف الطلب');
+  }
+
   async function updateMessage(id, status) {
     const res = await fetch('/api/admin/contacts', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
     if (res.ok) await load(); else setMsg('تعذر تحديث حالة الرسالة');
@@ -304,12 +318,12 @@ export default function AdminClient() {
   }
 
   const title =
-    tab === 'projects'
+    tab === 'marketing'
+      ? 'طلبات التسويق'
+      : tab === 'projects'
       ? 'المباني'
       : tab === 'finishing'
         ? 'التشطيبات'
-          : tab === 'investments'
-          ? 'الاستثمارات'
           : tab === 'messages'
             ? 'الرسائل'
             : 'التعليقات';
@@ -348,12 +362,7 @@ export default function AdminClient() {
             التشطيبات
           </button>
 
-          <button
-            onClick={() => setTab('investments')}
-            className={tab === 'investments' ? 'active' : ''}
-          >
-            استثمار
-          </button>
+          <button onClick={() => setTab('marketing')} className={tab === 'marketing' ? 'active' : ''}>طلبات التسويق</button>
 
           <button onClick={() => setTab('messages')} className={tab === 'messages' ? 'active' : ''}>الرسائل {unread > 0 && <span className="badge">{unread}</span>}</button>
 
@@ -383,7 +392,11 @@ export default function AdminClient() {
           {/* المحتوى */}
           {/* ========================= */}
 
-          {tab === 'messages' ? (
+          {tab === 'marketing' ? (
+            <div className="admin-list marketing-admin-list">
+              {[['sell', 'طلبات بيع الوحدات', marketingRequests.sell], ['buy', 'طلبات شراء الوحدات', marketingRequests.buy]].map(([type, label, list]) => <section className="admin-request-group" key={type}><h2>{label}</h2>{list.map((item) => <article className="admin-item message-item" key={item._id}><div><strong>{item.name} — {item.propertyType}</strong><p>{type === 'sell' ? `المساحة: ${item.area} | المنطقة: ${item.location} | السعر: ${item.price} | رقم العقار: ${item.propertyNumber}` : `المنطقة: ${item.location} | المساحة: ${item.area} | الميزانية: ${item.budget}`}</p><small>الهاتف: {item.phone} · التشطيب: {item.finishing} · العدادات: {item.metersComplete}</small><small>{type === 'buy' && `المتطلبات: ${item.requirements || 'لا توجد'}`}</small><small>تاريخ الطلب: {item.createdAt ? new Date(item.createdAt).toLocaleString('ar-EG') : '-'} · الحالة: {item.status === 'reviewed' ? 'تمت المراجعة' : 'جديدة'}</small></div><div className="actions"><a className="btn ghost darkbtn" href={`tel:${item.phone}`}>اتصال</a><a className="btn ghost darkbtn" href={`https://wa.me/${item.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">واتساب</a><button className="btn primary" onClick={() => updateMarketing(item._id, type, item.status === 'reviewed' ? 'new' : 'reviewed')}>{item.status === 'reviewed' ? 'تحديد كجديدة' : 'تمت المراجعة'}</button><button className="btn danger" onClick={() => deleteMarketing(item._id, type)}>حذف</button></div></article>)}{!list.length && <div className="empty">لا توجد طلبات.</div>}</section>)}
+            </div>
+          ) : tab === 'messages' ? (
             <div className="admin-list messages-list">
               {messages.map((item) => (
                 <article className={`admin-item message-item ${item.status === 'unread' ? 'is-unread' : ''}`} key={item._id}>
@@ -445,7 +458,7 @@ export default function AdminClient() {
                 {form.image && <small>تم تجهيز الصورة للنشر</small>}
 
                 <label className="upload-field">
-                  فيديو المحتوى (اختياري)
+                  فيديو ا��محتوى (اختياري)
                   <input type="file" accept="video/*" onChange={e => { const file = e.target.files?.[0]; setUploads(prev => ({ ...prev, video: file || null })); uploadFile(file, 'video'); }} />
                 </label>
                 {form.video && <small>تم تجهيز الفيديو للنشر</small>}

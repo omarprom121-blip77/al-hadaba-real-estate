@@ -141,9 +141,8 @@ export default function HomeClient() {
             <span />
           </button>
           <nav id="main-menu" className={menuOpen ? "menu-open" : ""}>
-            <Link href="/finishing" onClick={() => setMenuOpen(false)}>التشطيبات</Link>
-            <Link href="/buildings" onClick={() => setMenuOpen(false)}>المباني</Link>
-            <Link href="#projects" onClick={() => setMenuOpen(false)}>المشروعات</Link>
+            <Link href="/marketing" onClick={() => setMenuOpen(false)}>التسويق</Link>
+            <Link href="/buildings" onClick={() => setMenuOpen(false)}>المشروعات</Link>
             <Link href="#contact" onClick={() => setMenuOpen(false)}>تواصل معنا</Link>
             <Link href="/login" className="nav-admin">دخول الإدارة</Link>
           </nav>

@@ -130,6 +130,15 @@ textarea {
 .marketing-form { margin-top: 24px; }
 .marketing-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .marketing-fields textarea { grid-column: 1 / -1; resize: vertical; }
+.choice-field { grid-column: 1 / -1; }
+.choice-field label { display: block; margin-bottom: 10px; color: #d8d0c3; font-weight: 700; }
+.choice-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.choice { min-height: 48px; border: 1px solid #ffffff24; border-radius: 8px; background: #0f0e0d; color: #d8d0c3; font: inherit; cursor: pointer; }
+.choice.active, .choice:hover { border-color: var(--gold); background: #b18a4b; color: #171513; }
+.armored-image { min-height: 150px; display: grid; place-items: center; margin-bottom: 18px; border-radius: 12px; background: linear-gradient(135deg, #242321, #73572c); color: #f7e6bc; font-size: 22px; font-weight: 800; }
+.armored-section .section-head > div { max-width: 680px; }
+.armored-section .section-head p { margin-top: 12px; line-height: 1.8; }
+
 .marketing-fields input, .marketing-fields textarea { width: 100%; min-width: 0; padding: 14px; border: 1px solid #ffffff24; border-radius: 8px; background: #0f0e0d; color: #fff; font: inherit; }
 .marketing-fields input::placeholder, .marketing-fields textarea::placeholder { color: #aaa197; }
 .marketing-form .btn { width: 100%; margin-top: 14px; }
@@ -678,6 +687,9 @@ footer {
 }
 
 .badge { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; margin-inline-start: 6px; border-radius: 999px; background: var(--gold); color: var(--dark); font-size: 12px; }
+.marketing-admin-list { display: grid; gap: 28px; }
+.admin-request-group { display: grid; gap: 12px; }
+.admin-request-group h2 { margin: 0; color: var(--dark); font-size: 24px; }
 .message-item { align-items: flex-start; }
 .message-item.is-unread { border-color: var(--gold); box-shadow: 0 0 0 2px #b18a4b18; }
 .message-item small { display: block; margin-top: 6px; color: var(--muted); }
@@ -718,7 +730,8 @@ footer {
   .marketing-grid { grid-template-columns: 1fr; padding-block: 28px 54px; }
   .marketing-card { padding: 22px; }
   .marketing-fields { grid-template-columns: 1fr; }
-  .marketing-fields textarea { grid-column: auto; }
+  .marketing-fields textarea, .choice-field { grid-column: auto; }
+  .choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .marketing-footer { width: min(100% - 32px, 560px); flex-direction: column; text-align: center; }
 
   body { overflow-x: hidden; }

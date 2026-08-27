@@ -141,9 +141,11 @@ export default function HomeClient() {
             <span />
           </button>
           <nav id="main-menu" className={menuOpen ? "menu-open" : ""}>
-            <Link href="/marketing" onClick={() => setMenuOpen(false)}>التسويق</Link>
             <Link href="/buildings" onClick={() => setMenuOpen(false)}>المشروعات</Link>
-            <Link href="#contact" onClick={() => setMenuOpen(false)}>تواصل معنا</Link>
+            <Link href="/finishing" onClick={() => setMenuOpen(false)}>التشطيبات</Link>
+            <Link href="/marketing" onClick={() => setMenuOpen(false)}>التسويق</Link>
+            <Link href="#armored-doors" onClick={() => setMenuOpen(false)}>أبواب مصفحة</Link>
+            <Link href="#contact" onClick={() => setMenuOpen(false)}>اتصل بنا</Link>
             <Link href="/login" className="nav-admin">دخول الإدارة</Link>
           </nav>
         </div>
@@ -282,6 +284,17 @@ href="#services"
             <article className="service-card"><span className="service-icon">01</span><h3>مقاولات عامة</h3><p>إدارة وتنفيذ متكامل لمشروعاتك من البداية حتى التسليم.</p></article>
             <article className="service-card"><span className="service-icon">02</span><h3>حفر وبناء</h3><p>أساسات قوية وتنفيذ دقيق يضمن جودة واستدامة كل مشروع.</p></article>
             <article className="service-card"><span className="service-icon">03</span><h3>تشطيب كامل</h3><p>تفاصيل نهائية راقية بأعلى معايير الجودة والاهتمام.</p></article>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= ARMORED DOORS ================= */}
+      <section className="section armored-section" id="armored-doors">
+        <div className="container">
+          <div className="section-head"><div><div className="eyebrow dark">خدمة حماية متكاملة</div><h2>أبواب مصفحة</h2><p>أبواب أمنية قوية تجمع بين الأمان العالي والعزل الجيد والتصميم الأنيق، بمقاسات حسب الطلب.</p></div><a className="btn primary" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer">اطلب الآن</a></div>
+          <div className="cards armored-cards">
+            <article className="service-card armored-card"><div className="armored-image" role="img" aria-label="أبواب مصفحة حسب الطلب">أبواب أمنية</div><h3>أمان عالي</h3><p>خامات قوية وتصميمات متعددة تناسب احتياجات منزلك ومشروعك.</p></article>
+            <article className="service-card armored-card"><div className="armored-image" role="img" aria-label="باب مصفح بتصميم متين">مقاسات حسب الطلب</div><h3>عزل جيد</h3><p>حلول عملية تجمع المتانة والأمان والمظهر الراقي.</p></article>
           </div>
         </div>
       </section>

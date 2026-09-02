@@ -528,6 +528,24 @@ textarea {
   max-width: 720px;
 }
 
+/* ================= ARMORED DOORS PAGE ================= */
+.armored-doors-page { min-height: 100vh; background: var(--dark); color: #fff; }
+.armored-doors-page .content-shell { width: min(1120px, calc(100% - 40px)); margin-inline: auto; padding: 70px 0 90px; }
+.armored-doors-page .content-header { display: flex; align-items: center; gap: 22px; margin-bottom: 42px; }
+.armored-doors-page .content-logo { flex: 0 0 auto; }
+.armored-doors-page .content-logo img { object-fit: contain; }
+.armored-doors-page h1 { margin: 8px 0 10px; color: #fff; font-size: clamp(36px, 6vw, 64px); }
+.armored-doors-page .content-header p { color: #d8d0c3; line-height: 1.8; }
+.door-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.door-card { overflow: hidden; border: 1px solid #b18a4b66; border-radius: 16px; background: #171513; }
+.door-image-button { display: block; width: 100%; padding: 0; border: 0; background: #25221d; cursor: pointer; }
+.door-image-button img { display: block; width: 100%; height: 390px; object-fit: cover; transition: transform .25s ease; }
+.door-image-button:hover img, .door-image-button:focus-visible img { transform: scale(1.03); }
+.door-card-body { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px; }
+.door-card-body h2 { margin: 5px 0 0; font-size: 21px; }
+.door-number { color: var(--gold-light); font-size: 13px; font-weight: 800; }
+.door-card-body .btn { flex: 0 0 auto; }
+
 /* ================= WHATSAPP ================= */
 
 .whatsapp {
@@ -718,6 +736,12 @@ footer {
 /* ================= MOBILE ================= */
 
 @media (max-width: 800px) {
+  .armored-doors-page .content-shell { width: min(100% - 32px, 560px); padding-top: 42px; }
+  .armored-doors-page .content-header { align-items: flex-start; gap: 14px; margin-bottom: 28px; }
+  .armored-doors-page .content-logo img { width: 42px; height: 42px; }
+  .door-grid { grid-template-columns: 1fr; gap: 18px; }
+  .door-image-button img { height: min(112vw, 520px); }
+
   .marketing-container { width: min(100% - 32px, 560px); }
   .marketing-page { background-size: auto, cover; background-position: center, center; }
   .marketing-brand { font-size: 15px; }

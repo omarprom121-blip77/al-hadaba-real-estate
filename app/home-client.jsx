@@ -185,38 +185,6 @@ href="#services"
         </div>
       </section>
 
-      {/* ================= ABOUT ================= */}
-      <section className="section about">
-        <div className="container split">
-          <div>
-            <div className="eyebrow dark">
-              من نحن
-            </div>
-
-            <h2>
-              نبذة عن عقارات الهضبة
-            </h2>
-
-            <p>
-              شركة عقارات الهضبة تقدم لك خدمات متكاملة
-              في المقاولات العامة والبناء والتشطيبات،
-              من خلال خبرة عملية وجودة موثوقة
-              متنوعة بطريقة سهلة واحترافية.
-            </p>
-          </div>
-
-          <div className="info-card">
-            <strong>
-              خبرة • ثقة • فرص
-            </strong>
-
-            <span>
-              منصة مرنة لعرض المشروعات والتواصل المباشر.
-            </span>
-          </div>
-        </div>
-      </section>
-
       {/* ================= PROJECTS ================= */}
       <section
         id="projects"
@@ -497,6 +465,38 @@ href="#services"
           </span>
         </div>
       </footer>
+
+      {/* ================= ABOUT ================= */}
+      <section className="section about">
+        <div className="container split">
+          <div>
+            <div className="eyebrow dark">
+              من نحن
+            </div>
+
+            <h2>
+              نبذة عن عقارات الهضبة
+            </h2>
+
+            <p>
+              شركة عقارات الهضبة تقدم لك خدمات متكاملة
+              في المقاولات العامة والبناء والتشطيبات،
+              من خلال خبرة عملية وجودة موثوقة
+              متنوعة بطريقة سهلة واحترافية.
+            </p>
+          </div>
+
+          <div className="info-card">
+            <strong>
+              خبرة • ثقة • فرص
+            </strong>
+
+            <span>
+              منصة مرنة لعرض المشروعات والتواصل المباشر.
+            </span>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
